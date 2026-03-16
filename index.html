@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Carrot Чат</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+</head>
+<body>
+    <div id="app">
+        <!-- ЭКРАН ВХОДА / РЕГИСТРАЦИИ -->
+        <div id="auth-screen" class="screen active">
+            <div class="auth-container">
+                <!-- НОВАЯ НАДПИСЬ Carrort 🥕 chat -->
+                <div class="auth-header">
+                    <h1 class="logo">Сarrort <span class="carrot-emoji">🥕</span> chat</h1>
+                    <p class="auth-subtitle">общайся свободно без опасений</p>
+                </div>
+                
+                <div id="auth-error" class="error-message"></div>
+                
+                <!-- Форма входа -->
+                <div id="login-form">
+                    <input type="text" id="login-username" placeholder="Имя пользователя" autocomplete="off">
+                    <input type="password" id="login-password" placeholder="Пароль">
+                    <button id="login-btn" class="btn-primary">Войти</button>
+                </div>
+
+                <button id="show-register-btn" class="btn-link">Нет аккаунта? Зарегистрироваться</button>
+                <button id="show-reset-password-btn" class="btn-link">Восстановить пароль</button>
+                
+                <!-- Форма регистрации -->
+                <div id="register-form" style="display: none;">
+                    <input type="text" id="reg-username" placeholder="Имя пользователя">
+                    <input type="password" id="reg-password" placeholder="Пароль">
+                    <input type="password" id="reg-password2" placeholder="Повторите пароль">
+                    <button id="register-btn" class="btn-primary">Зарегистрироваться</button>
+                    <button id="back-to-login-from-register" class="btn-link">Назад к входу</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ЭКРАН ВОССТАНОВЛЕНИЯ ПАРОЛЯ -->
+        <div id="reset-screen" class="screen">
+            <div class="auth-container">
+                <div class="auth-header">
+                    <h1 class="logo">Carrort <span class="carrot-emoji">🥕</span> chat</h1>
+                    <p class="auth-subtitle">восстановление доступа</p>
+                </div>
+                <div id="reset-error" class="error-message"></div>
+                <input type="text" id="reset-username" placeholder="Имя пользователя">
+                <input type="email" id="reset-email" placeholder="Электронная почта">
+                <button id="reset-password-btn" class="btn-primary">Сбросить пароль</button>
+                <button id="back-to-auth-from-reset" class="btn-link">Назад к входу</button>
+            </div>
+        </div>
+
+        <!-- ГЛАВНЫЙ ЭКРАН ЧАТА -->
+        <div id="main-screen" class="screen">
+            <div class="chats-header">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <h2>Мои чаты</h2>
+                    <!-- Кнопка админ-панели -->
+                    <button id="admin-panel-btn" class="admin-crown" style="display: none;">👑</button>
+                </div>
+                <button id="add-chat-btn" class="btn-icon">+</button>
+            </div>
+            <div id="chats-list" class="chats-list"></div>
+            <div class="bottom-nav">
+                <button id="nav-chats" class="nav-btn active" data-icon="💬">Чаты</button>
+                <button id="nav-profile" class="nav-btn" data-icon="🥕">Профиль</button>
+            </div>
+        </div>
+
+        <!-- ЭКРАН ПРОФИЛЯ -->
+        <div id="profile-screen" class="screen">
+            <div class="profile-header">
+                <h2>Профиль</h2>
+            </div>
+            <div class="profile-content">
+                <div id="profile-username" class="profile-username"></div>
+                
+                <!-- Email -->
+                <input type="email" id="profile-email" placeholder="Email для сброса пароля">
+                <button id="save-email-btn" class="btn-primary">Сохранить email</button>
+                
+                <!-- Смена пароля -->
+                <button id="show-change-password-btn" class="btn-secondary">Изменить пароль</button>
+                
+                <!-- Форма смены пароля -->
+                <div id="change-password-form" style="display: none; margin-top: 1rem;">
+                    <input type="password" id="current-password" placeholder="Текущий пароль">
+                    <input type="password" id="new-password" placeholder="Новый пароль">
+                    <input type="password" id="new-password2" placeholder="Повторите новый пароль">
+                    <button id="change-password-btn" class="btn-primary">Изменить</button>
+                    <button id="cancel-change-password" class="btn-link">Отмена</button>
+                </div>
+                
+                <!-- Кнопка удаления аккаунта -->
+                <button id="show-delete-account-modal-btn" class="btn-danger">🗑️ Удалить аккаунт</button>
+                
+                <button id="logout-btn" class="btn-secondary">Выйти</button>
+            </div>
+            <div class="bottom-nav">
+                <button id="nav-chats-from-profile" class="nav-btn" data-icon="💬">Чаты</button>
+                <button id="nav-profile-from-profile" class="nav-btn active" data-icon="🥕">Профиль</button>
+            </div>
+        </div>
+
+        <!-- ЭКРАН АДМИН-ПАНЕЛИ -->
+        <div id="admin-screen" class="screen">
+            <div class="admin-header">
+                <button id="back-from-admin" class="back-btn">←</button>
+                <h2>👑 Админ-панель</h2>
+            </div>
+            <div class="admin-content">
+                <!-- Статистика -->
+                <div class="admin-stats">
+                    <div class="stat-card">
+                        <span class="stat-value" id="total-users">0</span>
+                        <span class="stat-label">Всего пользователей</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-value" id="blocked-users">0</span>
+                        <span class="stat-label">Заблокировано</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-value" id="admin-count">0</span>
+                        <span class="stat-label">Администраторов</span>
+                    </div>
+                </div>
+
+                <!-- Поиск пользователей -->
+                <input type="text" id="admin-search" placeholder="🔍 Поиск пользователей...">
+
+                <!-- Список пользователей -->
+                <div class="users-list-container">
+                    <h3>Управление пользователями</h3>
+                    <div id="admin-users-list" class="admin-users-list"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ЭКРАН ЧАТА -->
+        <div id="chat-screen" class="screen">
+            <div class="chat-header">
+                <button id="back-to-chats-btn" class="back-btn">←</button>
+                <span id="chat-partner-name">Общий чат</span>
+            </div>
+            <div id="messages-container" class="messages-container"></div>
+            <div class="message-input-area">
+                <input type="text" id="message-input" placeholder="Введите сообщение...">
+                <button id="send-message-btn" class="send-btn">➤</button>
+            </div>
+        </div>
+
+        <!-- МОДАЛЬНЫЕ ОКНА -->
+
+        <!-- Добавление чата -->
+        <div id="add-chat-modal" class="modal" style="display: none;">
+            <div class="modal-content">
+                <h3>Добавить собеседника</h3>
+                <input type="text" id="new-chat-username" placeholder="Имя пользователя">
+                <div id="modal-error" class="error-message"></div>
+                <div class="modal-buttons">
+                    <button id="modal-cancel-btn" class="btn-secondary">Отмена</button>
+                    <button id="modal-add-btn" class="btn-primary">Добавить</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Новый пароль -->
+        <div id="new-password-modal" class="modal" style="display: none;">
+            <div class="modal-content">
+                <h3>Новый пароль сгенерирован</h3>
+                <p style="color: #ff8c00; font-size: 1.5rem; text-align: center; margin: 1rem 0;" id="new-password-display"></p>
+                <div class="modal-buttons">
+                    <button id="copy-password-btn" class="btn-secondary">📋 Копировать</button>
+                    <button id="close-password-modal-btn" class="btn-primary">OK</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Редактирование сообщения -->
+        <div id="edit-message-modal" class="modal" style="display: none;">
+            <div class="modal-content">
+                <h3>Редактировать сообщение</h3>
+                <input type="text" id="edit-message-input" placeholder="Введите новый текст">
+                <div class="modal-buttons">
+                    <button id="edit-message-cancel" class="btn-secondary">Отмена</button>
+                    <button id="edit-message-save" class="btn-primary">Сохранить</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- МОДАЛЬНОЕ ОКНО УДАЛЕНИЯ АККАУНТА -->
+        <div id="delete-account-modal" class="modal" style="display: none;">
+            <div class="modal-content" style="border-color: #dc3545;">
+                <h3 style="color: #dc3545;">⚠️ Удаление аккаунта</h3>
+                <p style="color: #e0e0e0; margin-bottom: 1rem;">
+                    Вы уверены, что хотите удалить свой аккаунт?<br>
+                    Это действие <span style="color: #dc3545; font-weight: bold;">нельзя отменить</span>!
+                </p>
+                <p style="color: #e0e0e0; margin-bottom: 1rem;">Все ваши данные будут безвозвратно удалены.</p>
+                
+                <input type="password" id="delete-account-password" placeholder="Введите ваш пароль для подтверждения">
+                <div id="delete-account-error" class="error-message" style="color: #dc3545;"></div>
+                
+                <div class="modal-buttons">
+                    <button id="delete-account-cancel" class="btn-secondary">Отмена</button>
+                    <button id="delete-account-confirm" class="btn-danger">🗑️ Удалить навсегда</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
