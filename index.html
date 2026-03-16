@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Carrot Чат</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+</head>
+<body>
+    <div id="app">
+        <!-- ЭКРАН ВХОДА / РЕГИСТРАЦИИ -->
+        <div id="auth-screen" class="screen active">
+            <div class="auth-container">
+                <h1 class="logo">carrot</h1>
+                <div id="auth-error" class="error-message"></div>
+                
+                <!-- Форма входа (всегда видна) -->
+                <div id="login-form">
+                    <input type="text" id="login-username" placeholder="Имя пользователя" autocomplete="off">
+                    <input type="password" id="login-password" placeholder="Пароль">
+                    <button id="login-btn" class="btn-primary">Войти</button>
+                </div>
+
+                <!-- Кнопки под формой входа -->
+                <button id="show-register-btn" class="btn-link">Нет аккаунта? Зарегистрироваться</button>
+                <button id="show-reset-password-btn" class="btn-link">Восстановить пароль</button>
+                
+                <!-- Форма регистрации (изначально скрыта) -->
+                <div id="register-form" style="display: none;">
+                    <input type="text" id="reg-username" placeholder="Имя пользователя">
+                    <input type="password" id="reg-password" placeholder="Пароль">
+                    <input type="password" id="reg-password2" placeholder="Повторите пароль">
+                    <button id="register-btn" class="btn-primary">Зарегистрироваться</button>
+                    <button id="back-to-login-from-register" class="btn-link">Назад к входу</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ЭКРАН ВОССТАНОВЛЕНИЯ ПАРОЛЯ -->
+        <div id="reset-screen" class="screen">
+            <div class="auth-container">
+                <h2 class="logo" style="font-size: 2rem;">Сброс пароля</h2>
+                <div id="reset-error" class="error-message"></div>
+                <input type="text" id="reset-username" placeholder="Имя пользователя">
+                <input type="email" id="reset-email" placeholder="Электронная почта">
+                <button id="reset-password-btn" class="btn-primary">Сбросить пароль</button>
+                <button id="back-to-auth-from-reset" class="btn-link">Назад к входу</button>
+            </div>
+        </div>
+
+        <!-- ГЛАВНЫЙ ЭКРАН ЧАТА -->
+        <div id="main-screen" class="screen">
+            <div class="chats-header">
+                <h2>Мои чаты</h2>
+                <button id="add-chat-btn" class="btn-icon">+</button>
+            </div>
+            <div id="chats-list" class="chats-list">
+                <!-- Чаты загружаются сюда -->
+            </div>
+            <div class="bottom-nav">
+                <button id="nav-chats" class="nav-btn active" data-icon="💬">Чаты</button>
+                <button id="nav-profile" class="nav-btn" data-icon="🥕">Профиль</button>
+            </div>
+        </div>
+
+        <!-- ЭКРАН ПРОФИЛЯ -->
+        <div id="profile-screen" class="screen">
+            <div class="profile-header">
+                <h2>Профиль</h2>
+            </div>
+            <div class="profile-content">
+                <div id="profile-username" class="profile-username"></div>
+                <input type="email" id="profile-email" placeholder="Введите email для сброса пароля">
+                <button id="save-email-btn" class="btn-primary">Сохранить email</button>
+                <button id="logout-btn" class="btn-secondary">Выйти</button>
+            </div>
+            <div class="bottom-nav">
+                <button id="nav-chats-from-profile" class="nav-btn" data-icon="💬">Чаты</button>
+                <button id="nav-profile-from-profile" class="nav-btn active" data-icon="🥕">Профиль</button>
+            </div>
+        </div>
+
+        <!-- ЭКРАН ЧАТА -->
+        <div id="chat-screen" class="screen">
+            <div class="chat-header">
+                <button id="back-to-chats-btn" class="back-btn">←</button>
+                <span id="chat-partner-name">Общий чат</span>
+            </div>
+            <div id="messages-container" class="messages-container"></div>
+            <div class="message-input-area">
+                <input type="text" id="message-input" placeholder="Введите сообщение...">
+                <button id="send-message-btn" class="send-btn">➤</button>
+            </div>
+        </div>
+
+        <!-- МОДАЛЬНОЕ ОКНО -->
+        <div id="add-chat-modal" class="modal" style="display: none;">
+            <div class="modal-content">
+                <h3>Добавить собеседника</h3>
+                <input type="text" id="new-chat-username" placeholder="Имя пользователя">
+                <div id="modal-error" class="error-message"></div>
+                <div class="modal-buttons">
+                    <button id="modal-cancel-btn" class="btn-secondary">Отмена</button>
+                    <button id="modal-add-btn" class="btn-primary">Добавить</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
